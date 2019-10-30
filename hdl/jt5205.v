@@ -22,10 +22,17 @@ module jt5205(
     input                  cen /* direct_enable */,        
     input         [ 1:0]   sel,        // s pin
     input         [ 3:0]   din,
-    output signed [11:0]   sound
+    output signed [11:0]   sound,
+    // This output pin is not part of MSM5205 I/O
+    // It helps integrating the system as it produces
+    // a strobe
+    // at the internal clock divider pace
+    output reg             irq
 );
 
 wire clk_en;        // internal clock enable signal dictated by sel bits
+
+always @(posedge clk) irq<=clk_en;
 
 jt5205_timing u_timing(
     .rst    ( rst       ),
