@@ -20,7 +20,7 @@ module jt5205_timing(
     input                  clk,
     input                  cen /* direct_enable */,        
     input         [ 1:0]   sel,        // s pin
-    output                 clk_en;
+    output reg             clk_en 
 );
 
 reg [6:0] cnt=7'd0;
@@ -28,12 +28,12 @@ reg       pre=1'b0;
 reg [6:0] lim;
 
 always @(posedge clk) begin
-    case(sel) begin
+    case(sel)
         2'd0: lim <= 7'd95;
         2'd1: lim <= 7'd63;
         2'd2: lim <= 7'd47;
         2'd3: lim <= 7'd1;
-    end
+    endcase
 end
 
 always @(posedge clk) if(cen) begin

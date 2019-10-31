@@ -35,7 +35,6 @@ wire clk_en;        // internal clock enable signal dictated by sel bits
 always @(posedge clk) irq<=clk_en;
 
 jt5205_timing u_timing(
-    .rst    ( rst       ),
     .clk    ( clk       ),
     .cen    ( cen       ),
     .sel    ( sel       ),
