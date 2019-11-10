@@ -30,21 +30,22 @@ module jt5205(
     output reg             irq
 );
 
-wire clk_en;        // internal clock enable signal dictated by sel bits
+wire cen_lo;        // internal clock enable signal dictated by sel bits
 
-always @(posedge clk) irq<=clk_en;
+always @(posedge clk) irq<=cen_lo;
 
 jt5205_timing u_timing(
     .clk    ( clk       ),
     .cen    ( cen       ),
     .sel    ( sel       ),
-    .clk_en ( clk_en    )
+    .cen_lo ( cen_lo    )
 );
 
 jt5205_adpcm u_adpcm(
     .rst    ( rst       ),
     .clk    ( clk       ),
-    .cen    ( clk_en    ),
+    .cen_lo ( cen_lo    ),
+    .cen_hf ( cen       ),
     .din    ( din       ),
     .sound  ( sound     )
 );

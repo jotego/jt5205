@@ -19,115 +19,73 @@
 module jt5205_adpcm(
     input                      rst,
     input                      clk,
-    input                      cen /* direct_enable */,        
+    (* direct_enable *) input  cen_hf,
+    (* direct_enable *) input  cen_lo,
     input             [ 3:0]   din,
     output reg signed [11:0]   sound
 );
 
-reg [ 5:0] step, step_inc;
-reg [ 6:0] step_lut[0:48];
-reg [ 6:0] step_size;
+reg [ 5:0] delta_idx, idx_inc;
+reg [10:0] delta[0:48];
 
-reg [11:0] step_sum;
+reg [11:0] dn, qn;
 reg        up;
 reg [ 2:0] factor;
 reg [ 3:0] din_copy;
-reg [ 5:0] next_step;
+reg [ 5:0] next_idx;
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         factor    <= 3'd0;
         up        <= 1'b0;
-        next_step <= 6'd0;
-        step_size <= 7'd0;
-        step_sum  <= 12'd0;
-    end else begin
-        up <= cen;
+        next_idx  <= 6'd0;
+        dn        <= 12'd0;
+        qn        <= 12'd0;
+    end else if(cen_hf) begin
+        up <= cen_lo;
         if( up ) begin
-            factor    <= din_copy[2:0];
-            step_size <= step_lut[step];            
-            step_sum  <= { 8'd0, step_lut[step][6:3]};
-            next_step <= din_copy[2] ? (step+step_inc) : (step-6'd1);
+            factor   <= din_copy[2:0];
+            dn       <= { 1'b0, delta[delta_idx] };
+            qn       <= { 1'd0, delta[delta_idx]>>3};
+            next_idx <= din_copy[2] ? (delta_idx+idx_inc) : (delta_idx-6'd1);
         end else begin
-            if(factor[0]) begin
-                step_sum  <= step_sum + step_size;
+            if(factor[2]) begin
+                qn <= qn + dn;
             end
-            step_size <= step_size>>1;
-            factor    <= factor>>1;
-            if( next_step>6'd48)
-                next_step <= din_copy[2] ? 6'd48 : 6'd0;
+            dn     <= dn>>1;
+            factor <= factor<<1;
+            if( next_idx>6'd48)
+                next_idx <= din_copy[2] ? 6'd48 : 6'd0;
         end
-    end        
+    end
 end
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
-        step     <= 6'd0;
-        sound    <= 12'd0;
-        din_copy <= 4'd0;
-    end else if(cen) begin
+        delta_idx <= 6'd0;
+        sound     <= 12'd0;
+        din_copy  <= 4'd0;
+    end else if(cen_lo) begin
         case( din[1:0] )
-            2'd0: step_inc <= 6'd2;
-            2'd1: step_inc <= 6'd4;
-            2'd2: step_inc <= 6'd6;
-            2'd3: step_inc <= 6'd8;
+            2'd0: idx_inc <= 6'd2;
+            2'd1: idx_inc <= 6'd4;
+            2'd2: idx_inc <= 6'd6;
+            2'd3: idx_inc <= 6'd8;
         endcase
         din_copy  <= din;
-        step      <= next_step;
-        sound     <= din_copy[3] ? sound - step_sum : sound + step_sum;
+        delta_idx <= next_idx;
+        sound     <= din_copy[3] ? sound - qn : sound + qn;
     end
 end
 
 initial begin
-    step_lut[ 0] = 7'd1;
-    step_lut[ 1] = 7'd1;
-    step_lut[ 2] = 7'd1;
-    step_lut[ 3] = 7'd1;
-    step_lut[ 4] = 7'd1;
-    step_lut[ 5] = 7'd1;
-    step_lut[ 6] = 7'd1;
-    step_lut[ 7] = 7'd1;
-    step_lut[ 8] = 7'd2;
-    step_lut[ 9] = 7'd2;
-    step_lut[10] = 7'd2;
-    step_lut[11] = 7'd2;
-    step_lut[12] = 7'd3;
-    step_lut[13] = 7'd3;
-    step_lut[14] = 7'd3;
-    step_lut[15] = 7'd4;
-    step_lut[16] = 7'd4;
-    step_lut[17] = 7'd5;
-    step_lut[18] = 7'd5;
-    step_lut[19] = 7'd6;
-    step_lut[20] = 7'd6;
-    step_lut[21] = 7'd7;
-    step_lut[22] = 7'd8;
-    step_lut[23] = 7'd8;
-    step_lut[24] = 7'd9;
-    step_lut[25] = 7'd10;
-    step_lut[26] = 7'd11;
-    step_lut[27] = 7'd13;
-    step_lut[28] = 7'd14;
-    step_lut[29] = 7'd15;
-    step_lut[30] = 7'd17;
-    step_lut[31] = 7'd19;
-    step_lut[32] = 7'd21;
-    step_lut[33] = 7'd23;
-    step_lut[34] = 7'd25;
-    step_lut[35] = 7'd28;
-    step_lut[36] = 7'd30;
-    step_lut[37] = 7'd34;
-    step_lut[38] = 7'd37;
-    step_lut[39] = 7'd41;
-    step_lut[40] = 7'd45;
-    step_lut[41] = 7'd49;
-    step_lut[42] = 7'd54;
-    step_lut[43] = 7'd60;
-    step_lut[44] = 7'd66;
-    step_lut[45] = 7'd72;
-    step_lut[46] = 7'd80;
-    step_lut[47] = 7'd88;
-    step_lut[48] = 7'd97;
+delta[ 0] = 11'd0016; delta[ 1] = 11'd0017; delta[ 2] = 11'd0019; delta[ 3] = 11'd0021; delta[ 4] = 11'd0023; delta[ 5] = 11'd0025; delta[ 6] = 11'd0028; 
+delta[ 7] = 11'd0031; delta[ 8] = 11'd0034; delta[ 9] = 11'd0037; delta[10] = 11'd0041; delta[11] = 11'd0045; delta[12] = 11'd0050; delta[13] = 11'd0055; 
+delta[14] = 11'd0060; delta[15] = 11'd0066; delta[16] = 11'd0073; delta[17] = 11'd0080; delta[18] = 11'd0088; delta[19] = 11'd0097; delta[20] = 11'd0107; 
+delta[21] = 11'd0118; delta[22] = 11'd0130; delta[23] = 11'd0143; delta[24] = 11'd0157; delta[25] = 11'd0173; delta[26] = 11'd0190; delta[27] = 11'd0209; 
+delta[28] = 11'd0230; delta[29] = 11'd0253; delta[30] = 11'd0279; delta[31] = 11'd0307; delta[32] = 11'd0337; delta[33] = 11'd0371; delta[34] = 11'd0408; 
+delta[35] = 11'd0449; delta[36] = 11'd0494; delta[37] = 11'd0544; delta[38] = 11'd0598; delta[39] = 11'd0658; delta[40] = 11'd0724; delta[41] = 11'd0796; 
+delta[42] = 11'd0876; delta[43] = 11'd0963; delta[44] = 11'd1060; delta[45] = 11'd1166; delta[46] = 11'd1282; delta[47] = 11'd1411; delta[48] = 11'd1552; 
 end
 
 endmodule

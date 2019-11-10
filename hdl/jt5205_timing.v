@@ -17,10 +17,10 @@
     Date: 30-10-2019 */
 
 module jt5205_timing(
-    input                  clk,
-    input                  cen /* direct_enable */,        
-    input         [ 1:0]   sel,        // s pin
-    output reg             clk_en 
+    input             clk,
+    (* direct_enable *) input cen,
+    input      [ 1:0] sel,        // s pin
+    output            cen_lo 
 );
 
 reg [6:0] cnt=7'd0;
@@ -45,8 +45,9 @@ always @(posedge clk) if(cen) begin
     end
 end
 
-always @(negedge clk) begin
-    clk_en <= pre;
-end
+reg pre2;
+always @(negedge clk) pre2<=pre;
+
+assign cen_lo = pre2&cen;
 
 endmodule
