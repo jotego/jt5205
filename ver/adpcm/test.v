@@ -57,7 +57,7 @@ end
 initial begin
     rst = 1'b0;
     #150 rst=1'b1;
-    #750 rst=1'b0;
+    #5000 rst=1'b0;
 end
 
 integer cnt=0;
