@@ -66,7 +66,7 @@ always @(posedge irq) begin
 `ifdef SINESIM
     din <= sine_data[cnt];
     cnt <= cnt<19 ? cnt+1 : 14;
-    if( $time>10_000_000) $finish;
+    if( $time>14_000_000) $finish;
 `else
     din <= data[cnt];
     cnt <= cnt+1;

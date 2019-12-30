@@ -30,7 +30,8 @@ module jt5205(
     output reg             irq
 );
 
-wire cen_lo;
+wire               cen_lo, cen_mid;
+wire signed [11:0] raw;
 
 always @(posedge clk) irq<=cen_lo;
 
@@ -40,6 +41,7 @@ jt5205_timing u_timing(
     .cen    ( cen       ),
     .sel    ( sel       ),
     .cen_lo ( cen_lo    ),
+    .cen_mid( cen_mid   ),
     .cenb_lo(           )
 );
 
@@ -49,7 +51,15 @@ jt5205_adpcm u_adpcm(
     .cen_lo ( cen_lo    ),
     .cen_hf ( cen       ),
     .din    ( din       ),
-    .sound  ( sound     )
+    .sound  ( raw       )
+);
+
+jt5205_interpol2x u_interpol(
+    .rst    ( rst       ),
+    .clk    ( clk       ),
+    .cen_mid( cen_mid   ),
+    .din    ( raw       ),
+    .dout   ( sound     )
 );
 
 endmodule
