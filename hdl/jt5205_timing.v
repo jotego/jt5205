@@ -21,9 +21,9 @@ module jt5205_timing(
     input             clk,
     (* direct_enable *) input cen,
     input      [ 1:0] sel,        // s pin
-    output  reg       cen_lo,
-    output  reg       cenb_lo,
-    output  reg       cen_mid
+    output            cen_lo,
+    output            cenb_lo,
+    output            cen_mid
 );
 
 reg [6:0] cnt;
@@ -56,11 +56,8 @@ always @(posedge clk, posedge rst) begin
     end
 end
 
-always @(posedge clk) begin
-    cen_lo  <= pre &cen;
-    cenb_lo <= preb&cen;
-    cen_mid <= (pre|preb)&cen;
-end
-
+assign cen_lo  = pre &cen;
+assign cenb_lo = preb&cen;
+assign cen_mid = (pre|preb)&cen;
 
 endmodule

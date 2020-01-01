@@ -76,7 +76,7 @@ end
 
 integer cen_cnt=0;
 
-always @(negedge clk) begin
+always @(posedge clk) begin
     cen <= 1'b0;
     if(cen_cnt==0) cen<=1'b1;
     cen_cnt <= cen_cnt==0 ? 3 : (cen_cnt-1);

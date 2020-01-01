@@ -27,13 +27,13 @@ module jt5205(
     // It helps integrating the system as it produces
     // a strobe
     // at the internal clock divider pace
-    output reg             irq
+    output                 irq
 );
 
 wire               cen_lo, cen_mid;
 wire signed [11:0] raw;
 
-always @(posedge clk) irq<=cen_lo;
+assign irq=cen_lo;
 
 jt5205_timing u_timing(
     .rst    ( rst       ),
