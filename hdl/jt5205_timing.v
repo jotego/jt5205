@@ -46,7 +46,7 @@ always @(posedge clk) if(cen) begin
 end
 
 reg pre2;
-always @(negedge clk) pre2<=pre;
+always @(posedge clk) pre2<=pre;
 
 assign cen_lo = pre2&cen;
 
