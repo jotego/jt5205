@@ -17,7 +17,6 @@
     Date: 30-10-2019 */
 
 module jt5205_timing(
-    input             rst,
     input             clk,
     (* direct_enable *) input cen,
     input      [ 1:0] sel,        // s pin
@@ -26,8 +25,8 @@ module jt5205_timing(
     output            cen_mid
 );
 
-reg [6:0] cnt;
-reg       pre, preb;
+reg [6:0] cnt=7'd0;
+reg       pre=1'b0, preb=1'b0;
 reg [6:0] lim;
 
 always @(posedge clk) begin
@@ -39,12 +38,8 @@ always @(posedge clk) begin
     endcase
 end
 
-always @(posedge clk, posedge rst) begin
-    if(rst) begin
-        cnt <= 7'd0;
-        pre <= 1'b0;
-        preb<= 1'b0;
-    end else if(cen) begin
+always @(posedge clk) begin
+    if(cen) begin
         cnt    <= cnt + 7'd1;
         pre    <= 1'b0;
         preb   <= 1'b0;

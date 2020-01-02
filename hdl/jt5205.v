@@ -33,10 +33,10 @@ module jt5205(
 wire               cen_lo, cen_mid;
 wire signed [11:0] raw;
 
-assign irq=cen_lo;
+assign irq=cen_lo; // Notice that irq is active even if rst is high. This is
+    // important for games such as Tora e no michi.
 
 jt5205_timing u_timing(
-    .rst    ( rst       ),
     .clk    ( clk       ),
     .cen    ( cen       ),
     .sel    ( sel       ),
