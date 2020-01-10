@@ -23,3 +23,7 @@ This is a pin-to-pin compatible module with OKI MSM5205. If you are just going t
 
 If you hear a periodic noise when there should be no output, check whether your target system was leaving the MSM5205 halted at reset when no output was needed. If The part is not reset it will keep processing the output and a constant 0 input will produce a repetitive noise.
 
+## FPGA arcade cores using this module:
+
+* [Double Dragon](https://github.com/jotego/jtdd), by the same author
+* [Tora e no michi](https://github.com/jotego/jt_gng), by the same author
