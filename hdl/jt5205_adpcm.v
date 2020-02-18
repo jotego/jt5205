@@ -33,6 +33,7 @@ reg        up;
 reg [ 2:0] factor;
 reg [ 3:0] din_copy;
 reg [ 5:0] next_idx;
+reg signed [12:0] unlim;
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
@@ -60,6 +61,22 @@ always @(posedge clk, posedge rst) begin
     end
 end
 
+function signed [12:0] extend;
+    input signed [11:0] a;
+    extend = { a[11], a };
+endfunction
+
+always @(*) begin
+    unlim = din_copy[3] ? extend(sound) - extend(qn) :
+                          extend(sound) + extend(qn);
+end
+
+wire signed [12:0] lim_pos =  13'd2047;
+wire signed [12:0] lim_neg = -13'd2048;
+
+wire ovp = unlim>lim_pos;
+wire ovn = unlim<lim_neg;
+
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         delta_idx <= 6'd0;
@@ -74,7 +91,7 @@ always @(posedge clk, posedge rst) begin
         endcase
         din_copy  <= din;
         delta_idx <= next_idx;
-        sound     <= din_copy[3] ? sound - qn : sound + qn;
+        sound     <= ovp ? 12'd2047 : ovn ? -12'd2048 : unlim[11:0];
     end
 end
 

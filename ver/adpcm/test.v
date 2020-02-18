@@ -62,16 +62,21 @@ end
 
 integer cnt=0;
 
-always @(posedge irq) begin
-`ifdef SINESIM
-    din <= sine_data[cnt];
-    cnt <= cnt<19 ? cnt+1 : 14;
-    if( $time>14_000_000) $finish;
-`else
-    din <= data[cnt];
-    cnt <= cnt+1;
-    if( cnt==fcnt/2 ) $finish;
-`endif
+reg last_irq;
+
+always @(posedge clk) begin
+    last_irq <= irq;
+    if( irq && !last_irq) begin
+    `ifdef SINESIM
+        din <= sine_data[cnt];
+        cnt <= cnt<19 ? cnt+1 : 14;
+        if( $time>14_000_000) $finish;
+    `else
+        din <= !cnt[0] ? data[cnt>>1][7:4] : data[cnt>>1][3:0];
+        cnt <= cnt+1;
+        if( cnt==fcnt*2 ) $finish;
+    `endif
+    end
 end
 
 integer cen_cnt=0;
@@ -94,5 +99,14 @@ end
         $shm_probe(test,"AS");
     end
 `endif
+
+integer fsnd;
+initial begin
+    fsnd=$fopen("sound.raw","wb");
+end
+wire signed [15:0] snd_log = { sound, 4'b0 };
+always @(posedge irq) begin
+    $fwrite(fsnd,"%u", {snd_log, snd_log});
+end
 
 endmodule

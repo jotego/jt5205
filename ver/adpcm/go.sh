@@ -10,3 +10,5 @@ else
     || exit 1
     sim -lxt
 fi
+
+raw2wav -s 8000 < sound.raw
