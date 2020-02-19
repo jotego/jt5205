@@ -67,8 +67,8 @@ function signed [12:0] extend;
 endfunction
 
 always @(*) begin
-    unlim = din_copy[3] ? extend(sound) - extend(qn) :
-                          extend(sound) + extend(qn);
+    unlim = din_copy[3] ? extend(sound) - {1'b0,qn} :
+                          extend(sound) + {1'b0,qn};
 end
 
 wire signed [12:0] lim_pos =  13'd2047;
@@ -80,7 +80,7 @@ wire ovn = unlim<lim_neg;
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         delta_idx <= 6'd0;
-        sound     <= 12'd0;
+        sound     <= -12'd2;
         din_copy  <= 4'd0;
     end else if(cen_lo) begin
         case( din[1:0] )

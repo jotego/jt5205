@@ -36,11 +36,11 @@ wire [7:0] next = test_data[rdcnt>>1];
 always @(posedge clk) begin
     cen <= ~cen;
     last_irq <= irq;
+    din   <= !rdcnt[0] ? next[7:4] : next[3:0];
     if( irq && !last_irq) begin
-        din   <= rdcnt[0] ? next[7:4] : next[3:0];
         rdcnt <= rdcnt+1;
     end
-    if( rdcnt > fcnt ) $finish;
+    if( (rdcnt>>1) > fcnt ) $finish;
 end
 
 
@@ -55,6 +55,7 @@ jt5205 uut(
 );
 
 `ifdef DUMP
+    initial $display ("INFO: will dump waveforms.");
     `ifndef NCVERILOG
         initial begin
             $dumpfile("test.lxt");

@@ -51,10 +51,11 @@ void oki_adpcm_state::reset()
 //  changes
 //-------------------------------------------------
 
-int16_t oki_adpcm_state::clock(uint8_t nibble)
+int16_t oki_adpcm_state::clock(uint8_t nibble, int& diff)
 {
 	// update the signal
-	m_signal += s_diff_lookup[m_step * 16 + (nibble & 15)];
+    diff = s_diff_lookup[m_step * 16 + (nibble & 15)];
+	m_signal += diff;
 
 	// clamp to the maximum
 	if (m_signal > 2047)
@@ -140,10 +141,11 @@ void oki_adpcm2_state::reset()
 //  changes
 //-------------------------------------------------
 
-int16_t oki_adpcm2_state::clock(uint8_t nibble)
+int16_t oki_adpcm2_state::clock(uint8_t nibble, int& diff)
 {
 	// update the signal
-	m_signal += s_diff_lookup[m_step * 16 + (nibble & 15)];
+    diff = s_diff_lookup[m_step * 16 + (nibble & 15)];
+	m_signal += diff;
 
 	// clamp to the maximum
 	if (m_signal > 2047)

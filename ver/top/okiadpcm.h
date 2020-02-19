@@ -25,7 +25,7 @@ public:
 	oki_adpcm_state() { compute_tables(); reset(); }
 
 	void reset();
-	int16_t clock(uint8_t nibble);
+	int16_t clock(uint8_t nibble, int& diff);
 
 	int32_t   m_signal;
 	int32_t   m_step;
@@ -49,7 +49,7 @@ public:
 	oki_adpcm2_state() { compute_tables(); reset(); }
 
 	void reset();
-	int16_t clock(uint8_t nibble);
+	int16_t clock(uint8_t nibble, int& diff);
 
 	int32_t   m_signal;
 	int32_t   m_step;
