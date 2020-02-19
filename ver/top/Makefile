@@ -1,1 +1,1 @@
-cps2test:
+cps2test: okiadpcm.cc cps2test.cc
