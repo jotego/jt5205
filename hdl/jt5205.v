@@ -27,7 +27,8 @@ module jt5205(
     // It helps integrating the system as it produces
     // a strobe
     // at the internal clock divider pace
-    output                 irq
+    output                 irq,
+    output                 vclk_o
 );
 
 wire               cen_lo, cen_mid;
@@ -42,7 +43,8 @@ jt5205_timing u_timing(
     .sel    ( sel       ),
     .cen_lo ( cen_lo    ),
     .cen_mid( cen_mid   ),
-    .cenb_lo(           )
+    .cenb_lo(           ),
+    .vclk_o (vclk_o     )
 );
 
 jt5205_adpcm u_adpcm(
