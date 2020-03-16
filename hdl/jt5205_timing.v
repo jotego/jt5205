@@ -22,7 +22,8 @@ module jt5205_timing(
     input      [ 1:0] sel,        // s pin
     output            cen_lo,
     output            cenb_lo,
-    output            cen_mid
+    output            cen_mid,
+    output reg        vclk_o
 );
 
 reg [6:0] cnt=7'd0;
@@ -39,15 +40,25 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
+
+    if (sel == 2'd3) begin
+      cnt <= 7'd0;
+      vclk_o <= 1'b0;
+    end
     if(cen) begin
-        cnt    <= cnt + 7'd1;
+        if (sel != 2'd3) cnt <= cnt + 7'd1;
+
         pre    <= 1'b0;
         preb   <= 1'b0;
         if(cnt==lim) begin
+            vclk_o <= 1'b1;
             cnt <= 7'd0;
             pre <= 1'b1;
         end
-        if(cnt==(lim>>1)) preb <=1'b1;
+        if(cnt==(lim>>1)) begin
+          preb <=1'b1;
+          vclk_o <= 1'b0;
+        end
     end
 end
 
