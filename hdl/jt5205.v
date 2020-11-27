@@ -30,6 +30,11 @@ module jt5205(
     // at the internal clock divider pace
     output                 irq,
     output                 vclk_o
+    `ifdef JT5205_DEBUG
+    ,
+    output signed [11:0]   debug_raw,
+    output                 debug_cen_lo
+    `endif
 );
 
 parameter INTERPOL=1; // 1 for simple linear interpolation. 0 for raw output
@@ -39,6 +44,11 @@ wire signed [11:0] raw;
 
 assign irq=cen_lo; // Notice that irq is active even if rst is high. This is
     // important for games such as Tora e no michi.
+
+`ifdef JT5205_DEBUG
+assign debug_raw    = raw;
+assign debug_cen_lo = cen_lo;
+`endif
 
 
 jt5205_timing u_timing(

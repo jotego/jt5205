@@ -1,6 +1,6 @@
 chunk_ok: cps2test raw2wav
 	mkdir -p chunk
-	rm chunk/*
+	rm -f chunk/*
 	cps2test ff_18.11c ff_19.12c
 	touch chunk_ok
 

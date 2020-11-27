@@ -3,7 +3,7 @@
 # it uses the files from Final Fight
 make || exit 1
 
-if which iverilog 2>/dev/null; then 
+if which iverilog 2>/dev/null; then
     SIM1="iverilog  -o sim -DDUMP"
     SIM2=" && sim -lxt"
 else
@@ -11,9 +11,10 @@ else
     SIM2=
 fi
 
+mkdir -p chunk
 NAME=chunk/chunk_$1.bin
 
-if [ ! -e $NAME ]; then 
+if [ ! -e $NAME ]; then
     echo "ERROR: cannot find file $NAME"
     echo "Use the hex number of the chunk in the chunk folder as the argument"
     exit 1

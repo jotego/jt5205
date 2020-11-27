@@ -65,7 +65,7 @@ always @(posedge clk ) if(cen_lo) begin
     if( rst )
         sound <= sound >>> 1; // fades away
     else
-        sound <= ovp ? 12'd2047 : ovn ? -12'd2048 : unlim[11:0];
+        sound <= unlim[12]!=unlim[11] ? { unlim[12], {11{~unlim[12]}}} : unlim[11:0];
 end
 
 function signed [12:0] extend;
@@ -77,12 +77,6 @@ always @(*) begin
     unlim = din_copy[3] ? extend(sound) - {1'b0,qn} :
                           extend(sound) + {1'b0,qn};
 end
-
-wire signed [12:0] lim_pos =  13'd2047;
-wire signed [12:0] lim_neg = -13'd2048;
-
-wire ovp = unlim>lim_pos;
-wire ovn = unlim<lim_neg;
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
