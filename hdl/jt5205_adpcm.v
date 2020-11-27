@@ -75,8 +75,8 @@ function signed [13:0] extend;
 endfunction
 
 always @(*) begin
-    unlim = din_copy[3] ? extend(sound) - {qn[12], qn} :
-                          extend(sound) + {qn[12], qn};
+    unlim = din_copy[3] ? extend(sound) - {1'b0, qn} :
+                          extend(sound) + {1'b0, qn};
 end
 
 always @(posedge clk, posedge rst) begin
