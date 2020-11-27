@@ -36,7 +36,6 @@ void RTL::reset() {
     top.din=0;
     next_sample(12);
     top.rst=0;
-    clk(10);
 }
 
 void RTL::clk( int cnt ) {
@@ -63,7 +62,7 @@ void RTL::next_sample( int cnt ) {
 
 int RTL::raw() {
     int x = top.debug_raw;
-    if( x>>11 ) x |= ~0x3FF;
+    if( x>>11 ) x |= ~0x7FF;
     return x;
 }
 
@@ -71,8 +70,8 @@ class Emu {
     int m_diff_lookup[16*49];
     const static int8_t s_index_shift[8];
     int s_diff_lookup[49*16];
-    int m_step;
 public:
+    int m_step;
     int m_signal;
     Emu();
     void reset() { m_step = m_signal = 0; };
@@ -92,31 +91,36 @@ public:
 int main( int argc, char *argv[] ) {
     RTL rtl;
     Emu emu;
-    Dly dly(2);
+    Dly dly(2), steps(2);
 
-    for( int din = 0; din<2; din++) {
-    printf("Din       RTL     EMU\n");
-    rtl.reset();
-    emu.reset();
-    dly.reset();
-    for( int j=0; j<10; j++ ) {
-        //din = rand()%16;
-        rtl.din( din );
-        rtl.next_sample();
-        emu.clock(din);
-        dly.push( emu.m_signal );
-        printf("%4d --> %4d   %4d", din, rtl.raw(), dly.read() );
-        if( dly.read() != rtl.raw() ) {
-            //printf(" *\nDiverged after %d steps\n", j+1 );
-            putchar('*');
-            //rtl.next_sample();
-            //rtl.next_sample();
-            //rtl.next_sample();
-            //return 1;
+    for( int din = 0; din<16; din++) {
+        bool bad=false;
+        printf("\nDin       RTL     EMU\n");
+        rtl.reset();
+        emu.reset();
+        dly.reset(); steps.reset();
+        for( int j=0; j<10; j++ ) {
+            //din = rand()%16;
+            rtl.din( din );
+            rtl.next_sample();
+            emu.clock(din);
+            dly.push( emu.m_signal );
+            steps.push( emu.m_step );
+            printf("%4d --> %5d (--)  %5d (%2d)", din, rtl.raw(), dly.read(), steps.read() );
+            if( dly.read() != rtl.raw() ) {
+                //printf(" *\nDiverged after %d steps\n", j+1 );
+                putchar('*');
+                //rtl.next_sample();
+                //rtl.next_sample();
+                //rtl.next_sample();
+                //return 1;
+                bad = true;
+            }
+            putchar('\n');
         }
-        putchar('\n');
+        if( bad ) return 1;
     }
-}
+    printf("PASS\n");
     return 0;
 }
 

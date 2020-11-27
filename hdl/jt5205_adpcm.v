@@ -28,12 +28,13 @@ module jt5205_adpcm(
 reg [ 5:0] delta_idx, idx_inc;
 reg [10:0] delta[0:48];
 
-reg [11:0] dn, qn;
+reg [11:0] dn;
+reg [12:0] qn;
 reg        up;
 reg [ 2:0] factor;
 reg [ 3:0] din_copy;
 reg [ 5:0] next_idx;
-reg signed [12:0] unlim;
+reg signed [13:0] unlim;
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
@@ -41,17 +42,17 @@ always @(posedge clk, posedge rst) begin
         up        <= 1'b0;
         next_idx  <= 6'd0;
         dn        <= 12'd0;
-        qn        <= 12'd0;
+        qn        <= 13'd0;
     end else if(cen_hf) begin
         up <= cen_lo;
         if( up ) begin
             factor   <= din_copy[2:0];
             dn       <= { 1'b0, delta[delta_idx] };
-            qn       <= { 1'd0, delta[delta_idx]>>3};
-            next_idx <= din_copy[2] ? (delta_idx+idx_inc) : (delta_idx-6'd1);
+            qn       <= { 2'd0, delta[delta_idx]>>3};
+            next_idx <= din_copy[2] ? (delta_idx+idx_inc) : (delta_idx-6'd2);
         end else begin
             if(factor[2]) begin
-                qn <= qn + dn;
+                qn <= qn + {1'b0, dn };
             end
             dn     <= dn>>1;
             factor <= factor<<1;
@@ -63,19 +64,19 @@ end
 
 always @(posedge clk ) if(cen_lo) begin
     if( rst )
-        sound <= sound >>> 1; // fades away
+        sound <= sound==-12'd1 ? 12'd0 : sound >>> 1; // fades away
     else
-        sound <= unlim[12]!=unlim[11] ? { unlim[12], {11{~unlim[12]}}} : unlim[11:0];
+        sound <= unlim[13:12]!={2{unlim[11]}} ? { unlim[13], {11{~unlim[13]}}} : unlim[11:0];
 end
 
-function signed [12:0] extend;
+function signed [13:0] extend;
     input signed [11:0] a;
-    extend = { a[11], a };
+    extend = { {2{a[11]}}, a };
 endfunction
 
 always @(*) begin
-    unlim = din_copy[3] ? extend(sound) - {1'b0,qn} :
-                          extend(sound) + {1'b0,qn};
+    unlim = din_copy[3] ? extend(sound) - {qn[12], qn} :
+                          extend(sound) + {qn[12], qn};
 end
 
 always @(posedge clk, posedge rst) begin
@@ -85,9 +86,9 @@ always @(posedge clk, posedge rst) begin
     end else if(cen_lo) begin
         case( din[1:0] )
             2'd0: idx_inc <= 6'd2;
-            2'd1: idx_inc <= 6'd4;
-            2'd2: idx_inc <= 6'd6;
-            2'd3: idx_inc <= 6'd8;
+            2'd1: idx_inc <= 6'd6;
+            2'd2: idx_inc <= 6'd9;
+            2'd3: idx_inc <= 6'd11;
         endcase
         din_copy  <= din;
         delta_idx <= next_idx;
