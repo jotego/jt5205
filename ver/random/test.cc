@@ -10,6 +10,7 @@ class RTL {
     VerilatedVcdC vcd;
     vluint64_t sim_time, half_period;
 public:
+    bool dump;
     RTL();
     void reset();
     void din( int data ) { top.din = data; }
@@ -26,6 +27,7 @@ RTL::RTL() {
     sim_time=0;
     half_period = 5;
     reset();
+    dump = true;
 }
 
 void RTL::reset() {
@@ -43,12 +45,12 @@ void RTL::clk( int cnt ) {
         sim_time += half_period;
         top.clk=0;
         top.eval();
-        vcd.dump(sim_time);
+        if( dump ) vcd.dump(sim_time);
 
         sim_time += half_period;
         top.clk=1;
         top.eval();
-        vcd.dump(sim_time);
+        if( dump )  vcd.dump(sim_time);
     }
 }
 
@@ -92,33 +94,32 @@ int main( int argc, char *argv[] ) {
     RTL rtl;
     Emu emu;
     Dly dly(2), steps(2);
+    bool verbose=false;
+    rtl.dump = false;
 
-    for( int din = 0; din<16; din++) {
-        bool bad=false;
-        printf("\nDin       RTL     EMU\n");
-        rtl.reset();
-        emu.reset();
-        dly.reset(); steps.reset();
-        for( int j=0; j<10; j++ ) {
-            //din = rand()%16;
-            rtl.din( din );
-            rtl.next_sample();
-            emu.clock(din);
-            dly.push( emu.m_signal );
-            steps.push( emu.m_step );
+    if( verbose ) printf("\nDin       RTL     EMU\n");
+    rtl.reset();
+    emu.reset();
+    dly.reset(); steps.reset();
+    int din;
+    for( int j=0; j<10'000'000; j++ ) {
+        bool bad = false;
+        din = rand()%16;
+        rtl.din( din );
+        rtl.next_sample();
+        emu.clock(din);
+        dly.push( emu.m_signal );
+        steps.push( emu.m_step );
+        if( dly.read() != rtl.raw() ) bad = true;
+        if( verbose ) {
             printf("%4d --> %5d (--)  %5d (%2d)", din, rtl.raw(), dly.read(), steps.read() );
-            if( dly.read() != rtl.raw() ) {
-                //printf(" *\nDiverged after %d steps\n", j+1 );
+            if( bad ) {
                 putchar('*');
-                //rtl.next_sample();
-                //rtl.next_sample();
-                //rtl.next_sample();
-                //return 1;
-                bad = true;
+                printf("FAIL\n");
+                return 1;
             }
             putchar('\n');
         }
-        if( bad ) return 1;
     }
     printf("PASS\n");
     return 0;
