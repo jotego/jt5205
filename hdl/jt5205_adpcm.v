@@ -69,10 +69,16 @@ always @(posedge clk, posedge rst) begin
 end
 
 always @(posedge clk ) if(cen_lo) begin
-    if( rst )
-        sound <= sound==-12'd1 ? 12'd0 : sound >>> 1; // fades away
-    else
+    if( rst ) begin
+        // sound fades away after a rst but the rest level must be -2
+        // otherwise noises can be heard (e.g. intro scene of Double Dragon)
+        if( sound>12'd0 || sound < -12'd2 )
+            sound <= sound >>> 1;
+        else
+            sound <= -12'd2;
+    end else begin
         sound <= unlim[13:12]!={2{unlim[11]}} ? { unlim[13], {11{~unlim[13]}}} : unlim[11:0];
+    end
 end
 
 function signed [13:0] extend;
