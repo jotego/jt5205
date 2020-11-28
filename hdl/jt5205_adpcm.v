@@ -36,6 +36,12 @@ reg [ 3:0] din_copy;
 reg [ 5:0] next_idx;
 reg signed [13:0] unlim;
 
+`ifdef SIMULATION
+initial begin
+    sound = -12'd2;
+end
+`endif
+
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         factor    <= 3'd0;
@@ -49,7 +55,7 @@ always @(posedge clk, posedge rst) begin
             factor   <= din_copy[2:0];
             dn       <= { 1'b0, delta[delta_idx] };
             qn       <= { 2'd0, delta[delta_idx]>>3};
-            next_idx <= din_copy[2] ? (delta_idx+idx_inc) : (delta_idx-6'd2);
+            next_idx <= din_copy[2] ? (delta_idx+idx_inc) : (delta_idx-6'd1);
         end else begin
             if(factor[2]) begin
                 qn <= qn + {1'b0, dn };
@@ -86,9 +92,9 @@ always @(posedge clk, posedge rst) begin
     end else if(cen_lo) begin
         case( din[1:0] )
             2'd0: idx_inc <= 6'd2;
-            2'd1: idx_inc <= 6'd6;
-            2'd2: idx_inc <= 6'd9;
-            2'd3: idx_inc <= 6'd11;
+            2'd1: idx_inc <= 6'd4;
+            2'd2: idx_inc <= 6'd6;
+            2'd3: idx_inc <= 6'd8;
         endcase
         din_copy  <= din;
         delta_idx <= next_idx;

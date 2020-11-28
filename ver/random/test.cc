@@ -146,7 +146,7 @@ int Dly::read() {
     return data[n];
 }
 
-const int8_t Emu::s_index_shift[8] = { -2, -2, -2, -2, 2, 6, 9, 11 };
+const int8_t Emu::s_index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 
 Emu::Emu()
 {
