@@ -37,7 +37,9 @@ module jt5205(
     `endif
 );
 
-parameter INTERPOL=1; // 1 for simple linear interpolation. 0 for raw output
+// Enabling the interpolator changes the sound of Chun Li's beat in
+// SF2 too much. So I decided to disable it
+parameter INTERPOL=0; // 1 for simple linear interpolation. 0 for raw output
 
 wire               cen_lo, cen_mid;
 wire signed [11:0] raw;
