@@ -42,13 +42,13 @@ void read_files( int argc, char *argv[], char *b) {
         fin.open( argv[2], ios_base::binary );
         if( fin.bad() ) throw "Cannot find the 2nd provided file";
         b += rdcnt;
-        fin.read( b, k256-rdcnt );        
+        fin.read( b, k256-rdcnt );
     }
 }
 
 void dump_chunks( oki_adpcm_state& oki, char *b ) {
     char *b0 = b;
-    for( int k=8,j=0; k<0x400; k+=8, b+=8 ) {
+    for( int k=8,j=0; k<0x400; k+=8, b+=8, j++ ) {
         int start = parse( b     );
         int end   = parse( b + 3 );
         if( start > k256 || end > k256 || end <= start ) continue;
@@ -59,7 +59,6 @@ void dump_chunks( oki_adpcm_state& oki, char *b ) {
         ofstream fout( fname.str(), ios_base::binary );
         fout.write( &b0[start], end-start );
         translate( b0, start, end, oki, j );
-        j++;
     }
 }
 
@@ -92,7 +91,7 @@ void translate( char *b, int start, int end, oki_adpcm_state& oki, int j ) {
         nibble = b[k]&0xf;
         data[0] = oki.clock( nibble, diff );
         data[1] = data[0];
-        w.write( data );        
+        w.write( data );
         fout << "0x" << hex << nibble << "\t * " << dec << data[0] << "\t (" << diff << ")\n";
     }
 }
