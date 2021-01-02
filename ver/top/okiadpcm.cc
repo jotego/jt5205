@@ -51,7 +51,7 @@ void oki_adpcm_state::reset()
 //  changes
 //-------------------------------------------------
 
-int16_t oki_adpcm_state::clock(uint8_t nibble, int& diff)
+int16_t oki_adpcm_state::clock(uint8_t nibble, int& diff, int& step)
 {
 	// update the signal
     diff = s_diff_lookup[m_step * 16 + (nibble & 15)];
@@ -70,6 +70,7 @@ int16_t oki_adpcm_state::clock(uint8_t nibble, int& diff)
 	else if (m_step < 0)
 		m_step = 0;
 
+	step = m_step;
 	// return the signal
 	return m_signal;
 }
@@ -141,7 +142,7 @@ void oki_adpcm2_state::reset()
 //  changes
 //-------------------------------------------------
 
-int16_t oki_adpcm2_state::clock(uint8_t nibble, int& diff)
+int16_t oki_adpcm2_state::clock(uint8_t nibble, int& diff, int& step )
 {
 	// update the signal
     diff = s_diff_lookup[m_step * 16 + (nibble & 15)];
@@ -160,6 +161,7 @@ int16_t oki_adpcm2_state::clock(uint8_t nibble, int& diff)
 	else if (m_step < 0)
 		m_step = 0;
 
+	step = m_step;
 	// return the signal
 	return m_signal;
 }

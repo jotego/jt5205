@@ -1,6 +1,8 @@
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <cmath>
+#include <cstdlib>
 
 using namespace std;
 
@@ -8,7 +10,7 @@ void csv(int *m_diff_lookup) {
     for( int nib=0; nib<16;nib++ ) {
         cout << nib << ',';
         for( int step=0; step<=48; step++ ) {
-            cout << m_diff_lookup[(step<<4)+nib] << ',';        
+            cout << m_diff_lookup[(step<<4)+nib] << ',';
         }
         cout << '\n';
     }
@@ -18,8 +20,8 @@ void verilog(int *m_diff_lookup) {
     for( int step=0; step<=48; step++ ) {
         for( int nib=0; nib<8;nib++ ) {
             int d = m_diff_lookup[(step<<4)+nib];
-            cout << "delta[" << setfill(' ') << setw(3) << ((step<<3)+nib) 
-                << "] = 12'd" 
+            cout << "delta[" << setfill(' ') << setw(3) << ((step<<3)+nib)
+                << "] = 12'd"
                 << setfill('0') << setw(4) << d << "; ";
         }
         cout << '\n';
@@ -33,11 +35,21 @@ void step_lut() {
         if(step>48) break;
         /* compute the step value */
         int stepval = floor (16.0 * pow (11.0 / 10.0, (double)step));
-        cout << "delta[" << setfill(' ') << setw(2) << step << "] = 11'd" 
+        cout << "delta[" << setfill(' ') << setw(2) << step << "] = 11'd"
             << setfill('0') << setw(4) << stepval << "; ";
         }
         cout << '\n';
     }
+}
+
+void csv_dump( int *lut ) {
+    ofstream fout("lut.csv");
+    for( int i=0; i<16; i++ )
+        for( int j=0; j<48; j++ ) {
+            char str[128];
+            sprintf( str, "%d, %d, %d\n", i, j, lut[j+i*49] );
+            fout << str;
+        }
 }
 
 int main() {
@@ -71,5 +83,6 @@ int main() {
     }
     // verilog(m_diff_lookup);
     step_lut();
+    csv_dump(m_diff_lookup);
     return 0;
 }

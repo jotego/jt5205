@@ -81,17 +81,20 @@ void translate( char *b, int start, int end, oki_adpcm_state& oki, int j ) {
     ofstream fout(fname.str());
     for( int k=start; k<end; k++ ) {
         int nibble = (b[k]>>4)&0xf;
-        int diff;
+        int diff, step;
         int16_t data[2];
-        data[0] = oki.clock( nibble, diff );
+        char s[128];
+        data[0] = oki.clock( nibble, diff, step );
         data[1] = data[0];
         w.write( data );
-        fout << "0x" << hex << nibble << "\t * " << dec << data[0] << "\t (" << diff << ")\n";
+        sprintf(s,"%Xh   %5d   (%4d @ %2d)\n", nibble, data[0], diff, step );
+        fout << s;
 
         nibble = b[k]&0xf;
-        data[0] = oki.clock( nibble, diff );
+        data[0] = oki.clock( nibble, diff, step );
         data[1] = data[0];
         w.write( data );
-        fout << "0x" << hex << nibble << "\t * " << dec << data[0] << "\t (" << diff << ")\n";
+        sprintf(s,"%Xh   %5d   (%4d @ %2d)\n", nibble, data[0], diff, step );
+        fout << s;
     }
 }
