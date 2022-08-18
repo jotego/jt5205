@@ -26,39 +26,42 @@ module jt5205_timing(
     output reg        vclk_o
 );
 
-reg [6:0] cnt=7'd0;
-reg       pre=1'b0, preb=1'b0;
+parameter VCLK_CEN=1;
+
+reg [6:0] cnt=0;
+reg       pre=0, preb=0;
 reg [6:0] lim;
 
 always @(posedge clk) begin
     case(sel)
-        2'd0: lim <= 7'd95;
-        2'd1: lim <= 7'd63;
-        2'd2: lim <= 7'd47;
-        2'd3: lim <= 7'd1;
+        0: lim <= 95;
+        1: lim <= 63;
+        2: lim <= 47;
+        3: lim <=  1;
     endcase
 end
 
 always @(posedge clk) begin
-
-    if (sel == 2'd3) begin
-      cnt <= 7'd0;
-      vclk_o <= 1'b0;
+    if(sel==3) begin
+      cnt    <= 0;
+      vclk_o <= 0;
     end
     if(cen) begin
-        if (sel != 2'd3) cnt <= cnt + 7'd1;
+        if(sel!=3) cnt <= cnt + 7'd1;
 
-        pre    <= 1'b0;
-        preb   <= 1'b0;
+        pre    <= 0;
+        preb   <= 0;
         if(cnt==lim) begin
-            vclk_o <= 1'b1;
-            cnt <= 7'd0;
-            pre <= 1'b1;
+            vclk_o <= 1;
+            cnt    <= 0;
+            pre    <= 1;
         end
         if(cnt==(lim>>1)) begin
-          preb <=1'b1;
-          vclk_o <= 1'b0;
+          preb   <= 1;
+          vclk_o <= 0;
         end
+    end else if(VCLK_CEN) begin
+        vclk_o <= 0;
     end
 end
 
