@@ -1,7 +1,7 @@
 # jt5205 hardware by Jose Tejada (@topapate)
 
 You can show your appreciation through
-* [Patreon](https://patreon.com/topapate), by supporting releases
+* [Patreon](https://patreon.com/jotego), by supporting releases
 * [Paypal](https://paypal.me/topapate), with a donation
 
 JT5205 is an ADPCM sound source written in Verilog, fully compatible with OKI MSM5205.
