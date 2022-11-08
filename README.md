@@ -6,6 +6,22 @@ You can show your appreciation through
 
 JT5205 is an ADPCM sound source written in Verilog, fully compatible with OKI MSM5205.
 
+## Using JT5205 in a git project
+
+If you are using JT5205 in a git project, the best way to add it to your project is:
+
+1. Optionally fork JT5205's repository to your own GitHub account
+2. Add it as a submodule to your git project: `git submodule add https://github.com/jotego/jt5205.git`
+3. Now you can refer to the RTL files in **jt5205/hdl**
+
+The advantages of a using a git submodule are:
+
+1. Your project contains a reference to a commit of the JT5205 repository
+2. As long as you do not manually update the JT5205 submodule, it will keep pointing to the same commit
+3. Each time you make a commit in your project, it will include a pointer to the JT5205 commit used. So you will always know the JT5205 that worked for you
+4. If JT5205 is updated and you want to get the changes, simply update the submodule using git. The new JT5205 commit used will be annotated in your project's next commit. So the history of your project will reflect that change too.
+5. JT5205 files will be intact and you will use the files without altering them.
+
 ## Port Description
 
 Name     | Direction | Width | Purpose
